@@ -1,27 +1,22 @@
+
 name: Push-to-EC2
-on: [push]
+
+# Trigger deployment only on push to main branch
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
+    name: Deploy to EC2 on master branch push
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout the files
         uses: actions/checkout@v2
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-        shell: bash
-
-      - name: Deploy with rsync
-        run: |
-          rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" ./ user@${{ secrets.HOST }}:${{ secrets.DIR }}
-        shell: bash
-
-      - name: Deploy to Server
+      - name: Deploy to Server 1
         uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
