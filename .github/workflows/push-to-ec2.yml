@@ -13,11 +13,13 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+        shell: bash
 
       - name: Deploy with rsync
         run: |
           rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" ./ user@${{ secrets.HOST }}:${{ secrets.DIR }}
+        shell: bash
 
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@main
@@ -26,8 +28,6 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: ${{ secrets.TARGET_DIR }}
-        with:
-          args: -avz --progress -e "ssh -v -o StrictHostKeyChecking=no"
 
       - name: Executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
