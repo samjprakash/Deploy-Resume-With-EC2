@@ -8,14 +8,14 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to EC2 on push to main branch
+    name: Deploy to EC2 on master branch push
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the repository
+      - name: Checkout the files
         uses: actions/checkout@v2
 
-      - name: Deploy files to EC2
+      - name: Deploy to resume-Server
         uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
@@ -23,7 +23,7 @@ jobs:
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: ${{ secrets.TARGET_DIR }}
 
-      - name: Execute remote commands on EC2
+      - name: Executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS }}
@@ -34,5 +34,5 @@ jobs:
             sudo apt-get install -y apache2
             sudo systemctl start apache2
             sudo systemctl enable apache2
-            cd /home/${{ secrets.USERNAME }}
+            cd home
             sudo mv * /var/www/html
